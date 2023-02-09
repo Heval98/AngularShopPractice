@@ -1,0 +1,22 @@
+<!-- <p>Cantidad de productos {{ myShoppingCart.length }}</p>
+<p>Total: ${{ total }}</p>
+<p>Today: {{ today | date : "short" }}</p>
+<p>Time from first day of the month: {{ otherDay | timeCalculation }}</p>
+<p>{{ "hoLA, BIENvENIdO A eSTA TIENDA" | uppercase }}</p> -->
+
+<button (click)="toggleProductDetails()">Click</button>
+<div class="products--grid">
+  <app-product
+    [product]="product"
+    *ngFor="let product of products"
+    (addedProduct)="onAddedProduct($event)"
+    (detailedProduct)="onShowDetails($event)"
+  ></app-product>
+</div>
+<div class="product-detail" [class.active]="showProductDetails">
+  <div *ngIf="productSelected">
+    <button (click)="toggleProductDetails()">Close</button>
+    <h1>{{ productSelected.title }}</h1>
+    <p>{{ productSelected.description }}</p>
+  </div>
+</div>
