@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Product } from '../../models/product.model';
+import {
+  Product,
+  CreateProductDTO,
+  UpdateProductDTO,
+} from '../../models/product.model';
 
 import { StoreService } from '../../services/store.service';
 import { ProductsService } from '../../services/products.service';
@@ -33,6 +37,10 @@ export class ProductsComponent implements OnInit {
     },
   };
 
+  limit = 10;
+  offset = 0;
+  detailStatus: 'loading' | 'success' | 'error' | 'init' = 'init';
+
   constructor(
     private storeService: StoreService,
     private productsService: ProductsService
@@ -41,7 +49,7 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.productsService.getAllProducts().subscribe((data) => {
+    this.productsService.getAllProducts(10, 0).subscribe((data) => {
       this.products = data;
     });
   }
@@ -56,9 +64,81 @@ export class ProductsComponent implements OnInit {
   }
 
   onShowDetails(id: string) {
-    this.productsService.getSelectedProduct(id).subscribe((data) => {
-      this.toggleProductDetails();
-      this.productSelected = data;
+    this.detailStatus = 'loading';
+    this.productsService.getSelectedProduct(id).subscribe(
+      (data) => {
+        this.toggleProductDetails();
+        this.productSelected = data;
+        this.detailStatus = 'success';
+      },
+      (response) => {
+        console.log(response);
+        this.detailStatus = 'error';
+      }
+    );
+  }
+
+  sendFakeItem(id: string) {
+    this.detailStatus = 'loading';
+    this.productsService.getSelectedProduct('2346').subscribe(
+      (data) => {
+        this.toggleProductDetails();
+        this.productSelected = data;
+        this.detailStatus = 'success';
+      },
+      (response) => {
+        console.log(response);
+        this.detailStatus = 'error';
+      }
+    );
+  }
+
+  createNewProduct() {
+    const newProduct: CreateProductDTO = {
+      title: 'Nuevo producto',
+      description: 'Test description',
+      images: ['https://placeimg.com/640/480/any'],
+      price: 1000,
+      categoryId: 2,
+    };
+
+    this.productsService.createProduct(newProduct).subscribe((data) => {
+      // console.log('Product created: ', data);
+      this.products.unshift(data);
     });
+  }
+
+  updateProduct() {
+    const changes: UpdateProductDTO = {
+      title: 'Nuevo titulo',
+    };
+    const id = this.productSelected.id;
+    this.productsService.updateProduct(id, changes).subscribe((data) => {
+      // console.log('Product updated', data);
+      const productIndex = this.products.findIndex(
+        (item) => item.id === this.productSelected.id
+      );
+      this.products[productIndex] = data;
+    });
+  }
+
+  deleteProduct() {
+    const id = this.productSelected.id;
+    this.productsService.deleteProduct(id).subscribe((data) => {
+      const productIndex = this.products.findIndex(
+        (item) => item.id === this.productSelected.id
+      );
+      this.products.splice(productIndex, 1);
+      this.showProductDetails = false;
+    });
+  }
+
+  loadMore() {
+    this.productsService
+      .getAllProducts(this.limit, this.offset)
+      .subscribe((data) => {
+        this.products = this.products.concat(data);
+        this.offset += this.limit;
+      });
   }
 }
