@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
   Product,
@@ -14,12 +14,19 @@ import { ProductsService } from '../../services/products.service';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss'],
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent {
   myShoppingCart: Product[] = [];
 
   total: number = 0;
 
-  products: Product[] = [];
+  @Input() products: Product[] = [];
+  @Input()
+  set productId(id: string | null) {
+    if (id) {
+      this.onShowDetails(id);
+    }
+  }
+  @Output() loadMore = new EventEmitter();
 
   today = new Date();
   otherDay = new Date(2023, 2, 1);
@@ -48,12 +55,6 @@ export class ProductsComponent implements OnInit {
     this.myShoppingCart = this.storeService.getShoppingCart();
   }
 
-  ngOnInit(): void {
-    this.productsService.getAllProducts(10, 0).subscribe((data) => {
-      this.products = data;
-    });
-  }
-
   onAddedProduct(product: Product) {
     this.storeService.addProduct(product);
     this.total = this.storeService.getTotal();
@@ -67,7 +68,10 @@ export class ProductsComponent implements OnInit {
     this.detailStatus = 'loading';
     this.productsService.getSelectedProduct(id).subscribe(
       (data) => {
-        this.toggleProductDetails();
+        // this.toggleProductDetails();
+        if (!this.showProductDetails) {
+          this.showProductDetails = true;
+        }
         this.productSelected = data;
         this.detailStatus = 'success';
       },
@@ -133,12 +137,7 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  loadMore() {
-    this.productsService
-      .getAllProducts(this.limit, this.offset)
-      .subscribe((data) => {
-        this.products = this.products.concat(data);
-        this.offset += this.limit;
-      });
+  onLoadMore() {
+    this.loadMore.emit();
   }
 }

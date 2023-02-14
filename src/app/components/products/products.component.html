@@ -13,7 +13,7 @@
     (addedProduct)="onAddedProduct($event)"
     (detailedProduct)="onShowDetails($event)"
   ></app-product>
-  <button (click)="loadMore()">Load More</button>
+  <button (click)="onLoadMore()">Load More</button>
 </div>
 <div class="product-detail" [class.active]="showProductDetails">
   <div *ngIf="productSelected">
