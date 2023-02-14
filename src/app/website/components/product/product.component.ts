@@ -1,7 +1,7 @@
 import { outputAst } from '@angular/compiler';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { Product } from '../../models/product.model';
+import { Product } from 'src/app/models/product.model';
 
 @Component({
   selector: 'app-product',
