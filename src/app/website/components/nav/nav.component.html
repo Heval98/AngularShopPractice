@@ -38,7 +38,11 @@
       </ul>
     </nav>
     <div class="info">
-      <div class="account">juan@juan.com</div>
+      <div class="account">
+        <button (click)="logName()">juan@mail.com</button>
+        <button (click)="logout()">Logout</button>
+        <button routerLink="/profile">Profile</button>
+      </div>
       <div class="cart">
         <a href="">
           <img src="../../../assets/svg/icon_shopping_cart.svg" alt="logo" />

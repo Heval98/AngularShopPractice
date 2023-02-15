@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
 import { NotFoundComponent } from './not-found/not-found.component';
+import { AdminGuard } from './guardians/admin.guard';
 
 const routes: Routes = [
   {
@@ -11,6 +12,7 @@ const routes: Routes = [
   },
   {
     path: 'cms',
+    canActivate: [AdminGuard],
     loadChildren: () => import('./cms/cms.module').then((m) => m.CmsModule),
   },
   {
@@ -20,7 +22,11 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+    }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
